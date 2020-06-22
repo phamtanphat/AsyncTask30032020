@@ -4,9 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,51 +31,53 @@ public class MainActivity extends AppCompatActivity {
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new MyWordAsync().execute();
+                new ReadJSON().execute();
             }
         });
-        // Bắt đầu xử lý
-            // Công việc 1
-            // Công việc 2
-            // Công việc 3
-            // Công việc 4
-            // Công việc 5
-        // Hoàn tất
     }
     //1 : Params : kieu du lieu truyen vao de xu ly trong doInbackground
     //2 : Progress : kieu du lieu de cap nhat giao dien khi xu ly trong doInbackground
     //3 : Result : kieu du lieu cua gia tri sau khi xu ly logic
-    class MyWordAsync extends AsyncTask<Void,String,String>{
+    class ReadJSON extends AsyncTask<Void,Void,String>{
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mTv.setText("Bắt đầu thực thi \n");
-        }
 
         @Override
         protected String doInBackground(Void... voids) {
-            for (int i = 1 ; i <= 5 ; i++){
-                publishProgress("Công việc thứ " + i + "\n");
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return "Hoàn tất";
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            mTv.append(values[0]);
-            super.onProgressUpdate(values);
+            return docNoiDung_Tu_URL("https://khoapham.vn/KhoaPhamTraining/json/tien/demo1.json");
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            mTv.append(s);
+            Log.d("BBB",s);
         }
     }
+
+    private String docNoiDung_Tu_URL(String theUrl){
+        StringBuilder content = new StringBuilder();
+        try    {
+            // create a url object
+            URL url = new URL(theUrl);
+
+            // create a urlconnection object
+            URLConnection urlConnection = url.openConnection();
+
+            // wrap the urlconnection in a bufferedreader
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+
+            String line;
+
+            // read from the urlconnection via the bufferedreader
+            while ((line = bufferedReader.readLine()) != null){
+                content.append(line + "\n");
+            }
+            bufferedReader.close();
+        }
+        catch(Exception e)    {
+            e.printStackTrace();
+        }
+        return content.toString();
+    }
+
+
 }
